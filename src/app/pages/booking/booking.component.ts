@@ -1,8 +1,10 @@
-import { Component,OnInit,viewChild,ViewChild } from '@angular/core';
+import { Component,OnInit,ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { registerLicense } from '@syncfusion/ej2-base';
 import { Booking,BookingService } from '../../booking.service';
-import { View,EventSettingsModel,ScheduleComponent} from '@syncfusion/ej2-angular-schedule';
+import { View,EventSettingsModel} from '@syncfusion/ej2-angular-schedule';
+import { ChangeDetectorRef } from '@angular/core';
+import { ScheduleComponent } from '@syncfusion/ej2-angular-schedule';
 // 2. Call registerLicense with your license key
 registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWX5ccXRURGlcUEN/XUU=');
 
@@ -35,26 +37,52 @@ export class BookingComponent implements OnInit{
     dataSource: []
   }
 
-  @ViewChild('schedule') public scheduleObj!: ScheduleComponent;
-
   constructor(
     private router: Router,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private cd: ChangeDetectorRef
   ) {}
 
+  @ViewChild('schedule') public scheduleObj!: ScheduleComponent;
+
+
   ngOnInit(): void {
-    // Load existing bookings on initialization
+   this.loadBookings();
+  }
+
+  ngAfterViewInit(): void {
+    // After the view is initialized, force a refresh
+    // This delay ensures that the Schedule component is fully rendered.
+    setTimeout(() => {
+      if (this.scheduleObj) {
+        this.scheduleObj.refresh();
+      }
+    }, 100);
+  }
+
+  private loadBookings(): void {
     this.bookingService.getAllBookings().subscribe({
       next: (bookings) => {
+        // Convert each Booking to an event object for the scheduler
         const events = bookings.map(b => this.toScheduleEvent(b));
-        this.eventObject.dataSource = events;
+        // Reassign a new data source to force change detection
+        this.eventObject = { ...this.eventObject, dataSource: events };
+
+        // Force change detection and refresh the schedule.
+        this.cd.detectChanges();
+        setTimeout(() => {
+          if (this.scheduleObj) {
+            this.scheduleObj.refresh();
+          }
+        }, 0);
       },
       error: (err) => console.error('Error fetching bookings:', err)
     });
   }
 
-  // Convert a Booking to an event object compatible with the schedule
+  // Convert a Booking to a Syncfusion schedule event object
   private toScheduleEvent(booking: Booking) {
+    // Combine the meeting date and time to create proper Date objects
     const startDate = new Date(booking.meetingDate + 'T' + booking.startTime);
     const endDate = new Date(booking.meetingDate + 'T' + booking.endTime);
     return {
@@ -66,7 +94,6 @@ export class BookingComponent implements OnInit{
     };
   }
 
-  
   onUserNameChange(event: Event) {
     const target = event.target as HTMLInputElement; // Cast to HTMLInputElement
     this.userName = target.value; // Update the userName property
@@ -77,26 +104,18 @@ export class BookingComponent implements OnInit{
     this.router.navigate(['/']); // Navigate back to the dashboard
   }
 
+  
   onSubmit() {
-    // Create the booking by sending it to the backend
+    // When the form is submitted, create the booking in the backend
     this.bookingService.createBooking(this.newBooking).subscribe({
       next: (createdBooking) => {
         console.log('Booking created:', createdBooking);
-        // Convert the new booking into a schedule event
-        const newEvent = this.toScheduleEvent(createdBooking);
+        
+        // Option 1: Instead of manually pushing to the events array,
+        // simply re-fetch all the bookings so the schedule always shows the current list.
+        this.loadBookings();
 
-        // Option 1: Reassign the data source to a new array reference
-        this.eventObject.dataSource = [
-          ...(this.eventObject.dataSource as any[]),
-          newEvent
-        ];
-
-        // Option 2: Refresh the schedule events (if needed)
-        if (this.scheduleObj) {
-          this.scheduleObj.refreshEvents();
-        }
-
-        // Reset the form for new booking entry
+        // Reset the form
         this.newBooking = {
           meetingTitle: '',
           bookedBy: '',
