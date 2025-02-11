@@ -1,0 +1,21 @@
+<div class="filters">
+    <h3>Filters</h3>
+    <div class="filter-group">
+      <label for="building">Building:</label>
+      <select id="building" (change)="onBuildingChange($event)">
+        <option value="all">All Buildings</option>
+        <option value="A">Building A</option>
+        <option value="B">Building B</option>
+        <option value="C">Building C</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="floor">Floor:</label>
+      <select id="floor" (change)="onFloorChange($event)">
+        <option value="all">All Floors</option>
+        <option value="G">Ground Floor</option>
+        <option value="1">1st Floor</option>
+        <option value="2">2nd Floor</option>
+      </select>
+    </div>
+  </div>

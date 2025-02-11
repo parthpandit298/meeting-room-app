@@ -1,0 +1,29 @@
+ .filters {
+    position: absolute;
+    top: 50%;               /* Move to the middle of the page */
+    right: 20px;            /* Position it on the right side */
+    transform: translateY(-50%); /* Adjust for exact vertical centering */
+    background: white;       /* Optional: Add background color */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .filter-group {
+    margin-bottom: 15px;
+  }
+  
+  label {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  
+
+  

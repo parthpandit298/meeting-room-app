@@ -1,0 +1,113 @@
+<div class="booking-page">
+  <div class="left-side">
+    <button class="back-button" (click)="goBack()">← Back</button>
+
+    <div class="form-container">
+      <h2>Book a Meeting Room</h2>
+      <!-- Notice: (ngSubmit)="onSubmit()" and #bookingForm="ngForm" -->
+      <form (ngSubmit)="onSubmit()" #bookingForm="ngForm">
+        
+        <!-- Meeting Title -->
+        <div class="form-group">
+          <label for="meetingTitle">Meeting Title</label>
+          <input
+            type="text"
+            id="meetingTitle"
+            name="meetingTitle"
+            placeholder="Enter meeting title"
+            [(ngModel)]="newBooking.meetingTitle"
+            />
+          </div>
+
+        <!-- Booked By (User Name/Email) -->
+        <div class="form-group">
+          <label for="userName">Booked By</label>
+          <input
+            type="text"
+            id="userName"
+            name="bookedBy"
+            [(ngModel)]="newBooking.bookedBy"
+          />
+        </div>
+
+        <!-- Meeting Date -->
+        <div class="form-group">
+          <label for="meetingDate">Meeting Date</label>
+          <input
+            type="date"
+            id="meetingDate"
+            name="meetingDate"
+            [(ngModel)]="newBooking.meetingDate"
+            required
+          />
+        </div>
+
+        <!-- Start Time -->
+        <div class="form-group">
+          <label for="startTime">Start Time</label>
+          <input
+            type="time"
+            id="startTime"
+            name="startTime"
+            [(ngModel)]="newBooking.startTime"
+            required
+          />
+        </div>
+
+        <!-- End Time -->
+        <div class="form-group">
+          <label for="endTime">End Time</label>
+          <input
+            type="time"
+            id="endTime"
+            name="endTime"
+            [(ngModel)]="newBooking.endTime"
+            required
+          />
+        </div>
+
+        <!-- Repeat Booking Dropdown -->
+        <div class="form-group">
+          <label for="repeatBooking">Repeat Booking</label>
+          <select
+            id="repeatBooking"
+            name="repeatBooking"
+            [(ngModel)]="newBooking.repeatBooking"
+          >
+            <option value="none">None</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">Description (Optional)</label>
+          <textarea
+            id="description"
+            name="description"
+            rows="4"
+            placeholder="Enter meeting description"
+            [(ngModel)]="newBooking.description"
+          ></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-button" [disabled]="bookingForm.invalid">
+          Confirm Booking
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ejs-schedule on the right side -->
+  <div>
+    <ejs-schedule
+      height="800"
+      width="1000"
+      [currentView]="setView"
+      [eventSettings]="eventObject">
+    </ejs-schedule>
+  </div>
+</div>

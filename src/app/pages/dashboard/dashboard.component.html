@@ -1,0 +1,14 @@
+<app-header></app-header>
+<div class="dashboard">
+  <h2>Available Meeting Rooms</h2>
+  <div class="dashboard">
+    <div class="left-side">
+      <app-room-list [rooms]="filteredRooms"></app-room-list>
+    </div>
+    <div class="right-side">
+      <app-filters
+        (buildingFilterChange)="onBuildingFilterChange($event)"
+        (floorFilterChange)="onFloorFilterChange($event)"
+      ></app-filters>
+    </div>
+</div>
