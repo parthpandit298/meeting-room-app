@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
+import { MeetingRoom,MeetingRoomService } from '../../meeting-room.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -6,19 +7,29 @@ import { Component } from '@angular/core';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit{
 
+  rooms: MeetingRoom[] = [];
+  filteredRooms : MeetingRoom[] = [];
 
-  rooms = [
-    { name: 'Room 1', location: 'Building A, Floor 1', nextAvailability: 'Available now', capacity: 6 },
-    { name: 'Room 2', location: 'Building A, Floor 2', nextAvailability: 'Next available at 3:00 PM', capacity: 4 },
-    { name: 'Room 3', location: 'Building B, Floor 1', nextAvailability: 'Next available at 3:00 PM', capacity: 8 },
-    { name: 'Room 4', location: 'Building C, Floor 1', nextAvailability: 'Next available at 3:00 PM', capacity: 6 },
-    { name: 'Room 2', location: 'Building C, Floor 2', nextAvailability: 'Next available at 3:00 PM', capacity: 8 },
-    // Add more rooms here...
-  ];
+  private currentBuilding = 'all';
+  private currentFloor = 'all';
 
-  filteredRooms = this.rooms;
+  constructor(private mettingRoomService: MeetingRoomService) {}
+
+  ngOnInit(): void {
+    // Fetch data from backend on component load
+    this.mettingRoomService.getAllRooms().subscribe({
+      next: (data: MeetingRoom[]) => {
+        // data = array of MeetingRoom objects
+        this.rooms = data;
+        this.filteredRooms = data; // default filter is everything
+      },
+      error: (error) => {
+        console.error('Error fetching rooms: ', error);
+      }
+    });
+  }
 
   onBuildingFilterChange(building: string) {
     this.filterRooms(building, this.currentFloor);
@@ -28,16 +39,19 @@ export class DashboardComponent {
     this.filterRooms(this.currentBuilding, floor);
   }
 
-  private currentBuilding = 'all';
-  private currentFloor = 'all';
-
   private filterRooms(building: string, floor: string) {
     this.currentBuilding = building;
     this.currentFloor = floor;
 
+    // If your data does not have a string "Building X" in it,
+    // you'll need to adapt the check here. For example:
+    // Instead of room.location.includes(`Building ${building}`)
+    // you might do something like:
+    // room.buildingName === building
+    // or handle 'all' as needed.
     this.filteredRooms = this.rooms.filter(room => {
-      const matchesBuilding = building === 'all' || room.location.includes(`Building ${building}`);
-      const matchesFloor = floor === 'all' || room.location.includes(`Floor ${floor}`);
+      const matchesBuilding = (building === 'all') || (room.buildingName === building);
+      const matchesFloor = (floor === 'all') || (room.floorNo.toString() === floor);
       return matchesBuilding && matchesFloor;
     });
   }

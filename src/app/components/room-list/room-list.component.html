@@ -1,11 +1,11 @@
 <div class="room-list">
     <div *ngFor="let room of rooms" class="room-box">
-      <h3>{{ room.name }}</h3>
-      <p>{{ room.location }}</p>
-      <p>Next Availability: {{ room.nextAvailability }}</p>
+      <h3>{{ room.meetingRoomName }}</h3>
+      <p>Location: {{ room.buildingName }}</p>
+      <p> Floor: {{ room.floorNo }}</p>
       <p>Capacity: {{ room.capacity }}</p>
       <div class = "book-room-button">
-        <button (click)="navigateToBooking()">Book</button>
+        <button (click)="navigateToBooking(room.id)">Book</button>
       </div>
     </div>
   </div>

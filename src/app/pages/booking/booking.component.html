@@ -6,6 +6,14 @@
       <h2>Book a Meeting Room</h2>
       <!-- Notice: (ngSubmit)="onSubmit()" and #bookingForm="ngForm" -->
       <form (ngSubmit)="onSubmit()" #bookingForm="ngForm">
+
+        <!-- <label>Select Meeting Room</label>
+        <select [(ngModel)]="selectedRoomId" (change)="onRoomChange()">
+          <option *ngFor="let r of rooms" [value]="r.id">
+            {{ r.meetingRoomName }} ({{ r.buildingName }} - Floor {{ r.floorNo }})
+          </option>
+        </select> -->
+        
         
         <!-- Meeting Title -->
         <div class="form-group">

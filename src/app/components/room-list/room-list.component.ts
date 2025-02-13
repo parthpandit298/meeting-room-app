@@ -1,5 +1,6 @@
 import { Component,Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { MeetingRoom } from '../../meeting-room.service';
 
 @Component({
   selector: 'app-room-list',
@@ -12,7 +13,7 @@ export class RoomListComponent {
 
   constructor(private router: Router){}
 
-  navigateToBooking() {
-    this.router.navigate(['/booking']);
+  navigateToBooking(roomId: number) {
+    this.router.navigate(['/booking',roomId]);
   }
 }

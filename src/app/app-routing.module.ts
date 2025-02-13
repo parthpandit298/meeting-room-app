@@ -6,7 +6,8 @@ import { BookingComponent } from './pages/booking/booking.component';
 const routes: Routes = [
   { path: '', component: DashboardComponent }, // Default route
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'booking', component: BookingComponent }
+  { path: 'booking', component: BookingComponent },
+  { path: 'booking/:roomId', component: BookingComponent },
 
 ];
 

@@ -1,10 +1,12 @@
-import { Component,OnInit,ViewChild } from '@angular/core';
+import { Component,OnInit,ViewChild,Input} from '@angular/core';
 import { Router } from '@angular/router';
 import { registerLicense } from '@syncfusion/ej2-base';
 import { Booking,BookingService } from '../../booking.service';
 import { View,EventSettingsModel} from '@syncfusion/ej2-angular-schedule';
 import { ChangeDetectorRef } from '@angular/core';
 import { ScheduleComponent } from '@syncfusion/ej2-angular-schedule';
+import { MeetingRoom,MeetingRoomService } from '../../meeting-room.service';
+import { ActivatedRoute } from '@angular/router';
 // 2. Call registerLicense with your license key
 registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWX5ccXRURGlcUEN/XUU=');
 
@@ -17,6 +19,9 @@ registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHV
 })
 export class BookingComponent implements OnInit{
 
+  rooms:MeetingRoom[] = [];
+  selectedRoomId: number | null = null;
+
   // This will be bound to your template via [(ngModel)]
   newBooking: Booking = {
     meetingTitle: '',
@@ -25,7 +30,8 @@ export class BookingComponent implements OnInit{
     startTime: '',
     endTime: '',
     repeatBooking: 'none',
-    description: ''
+    description: '',
+    meetingRoom:{} as MeetingRoom
   };
 
   userName: string = 'John Doe';
@@ -40,7 +46,9 @@ export class BookingComponent implements OnInit{
   constructor(
     private router: Router,
     private bookingService: BookingService,
-    private cd: ChangeDetectorRef
+    private meetingRoomService : MeetingRoomService,
+    private cd: ChangeDetectorRef,
+    private route:ActivatedRoute
   ) {}
 
   @ViewChild('schedule') public scheduleObj!: ScheduleComponent;
@@ -48,8 +56,54 @@ export class BookingComponent implements OnInit{
 
   ngOnInit(): void {
    this.loadBookings();
+   // 1) Read route param
+   this.route.paramMap.subscribe(params => {
+    const roomIdParam = params.get('roomId');
+    if (roomIdParam) {
+      this.selectedRoomId = +roomIdParam;
+      this.loadBookingsForRoom(this.selectedRoomId) // convert to number
+    }
+  });
+
+  // 2) Load all meeting rooms (for the dropdown)
+  this.meetingRoomService.getAllRooms().subscribe({
+    next: (data) => {
+      this.rooms = data;
+    },
+    error: (err) => console.error(err)
+  });
+
+  // 3) If we have a roomId from the route, load only that room’s bookings
+  if (this.selectedRoomId) {
+    this.loadBookingsForRoom(this.selectedRoomId);
   }
 
+  }
+
+  private loadBookingsForRoom(roomId: number): void {
+    this.bookingService.getBookingsByRoom(roomId).subscribe({
+      next: (bookings) => {
+        const events = bookings.map(b => this.toScheduleEvent(b));
+        this.eventObject = { ...this.eventObject, dataSource: events };
+  
+        // Force change detection and refresh the schedule
+        this.cd.detectChanges();
+        setTimeout(() => {
+          if (this.scheduleObj) {
+            this.scheduleObj.refresh();
+          }
+        }, 0);
+      },
+      error: (err) => console.error('Error fetching bookings:', err)
+    });
+  }
+
+  onRoomChange() {
+    if (this.selectedRoomId) {
+      this.loadBookingsForRoom(this.selectedRoomId);
+    }
+  }
+  
   ngAfterViewInit(): void {
     // After the view is initialized, force a refresh
     // This delay ensures that the Schedule component is fully rendered.
@@ -106,16 +160,29 @@ export class BookingComponent implements OnInit{
 
   
   onSubmit() {
-    // When the form is submitted, create the booking in the backend
+    if (!this.selectedRoomId) {
+      alert('Please select a room before booking');
+      return;
+    }
+  
+    // Find the selected room in rooms array
+    const selectedRoom = this.rooms.find(r => r.id === this.selectedRoomId);
+    if (!selectedRoom) {
+      alert('Invalid room selection');
+      return;
+    }
+  
+    // Set meetingRoom
+    this.newBooking.meetingRoom = selectedRoom;
+  
     this.bookingService.createBooking(this.newBooking).subscribe({
       next: (createdBooking) => {
         console.log('Booking created:', createdBooking);
-        
-        // Option 1: Instead of manually pushing to the events array,
-        // simply re-fetch all the bookings so the schedule always shows the current list.
-        this.loadBookings();
-
-        // Reset the form
+  
+        // Reload the bookings for the same room
+        this.loadBookingsForRoom(this.selectedRoomId!);
+  
+        // Reset form
         this.newBooking = {
           meetingTitle: '',
           bookedBy: '',
@@ -123,12 +190,13 @@ export class BookingComponent implements OnInit{
           startTime: '',
           endTime: '',
           repeatBooking: 'none',
-          description: ''
+          description: '',
+          meetingRoom: {} as MeetingRoom
         };
       },
-      error: (err) => {
-        console.error('Error creating booking:', err);
-      }
+      error: (err) => console.error('Error creating booking:', err)
     });
   }
+  
+  
 }

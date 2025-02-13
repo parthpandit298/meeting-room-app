@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { MeetingRoom } from './meeting-room.service';
 
 // Define a Booking interface (match with the Spring Boot model)
 export interface Booking {
@@ -12,6 +13,7 @@ export interface Booking {
   endTime: string;      // "HH:mm"
   repeatBooking: string;
   description: string;
+  meetingRoom: MeetingRoom;
 }
 
 @Injectable({
@@ -42,4 +44,9 @@ export class BookingService {
   deleteBooking(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  getBookingsByRoom(roomId: number): Observable<Booking[]> {
+    return this.http.get<Booking[]>(`${this.apiUrl}/room/${roomId}`);
+  }
+  
 }
