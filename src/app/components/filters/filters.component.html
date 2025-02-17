@@ -4,9 +4,9 @@
       <label for="building">Building:</label>
       <select id="building" (change)="onBuildingChange($event)">
         <option value="all">All Buildings</option>
-        <option value="A">Building A</option>
-        <option value="B">Building B</option>
-        <option value="C">Building C</option>
+        <option value="8A">Building A</option>
+        <option value="8B">Building B</option>
+        <option value="8C">Building C</option>
       </select>
     </div>
     <div class="filter-group">
@@ -16,6 +16,15 @@
         <option value="G">Ground Floor</option>
         <option value="1">1st Floor</option>
         <option value="2">2nd Floor</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="capacity">Capacity:</label>
+      <select id="capacity" (change)="onCapacityChange($event)">
+        <option value="all">All Rooms</option>
+        <option value="4"> Max 4</option>
+        <option value="6"> Max 6</option>
+        <option value="8"> Max 8</option>
       </select>
     </div>
   </div>

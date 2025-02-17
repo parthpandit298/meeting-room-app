@@ -1,4 +1,4 @@
-import { Component,Output,EventEmitter } from '@angular/core';
+import { Component,Output,EventEmitter,OnInit,Input} from '@angular/core';
 
 @Component({
   selector: 'app-filters',
@@ -6,9 +6,14 @@ import { Component,Output,EventEmitter } from '@angular/core';
   templateUrl: './filters.component.html',
   styleUrl: './filters.component.css'
 })
-export class FiltersComponent {
+export class FiltersComponent{
   @Output() buildingFilterChange = new EventEmitter<string>();
   @Output() floorFilterChange = new EventEmitter<string>();
+  @Output() capacityFilterChange = new EventEmitter<string>();
+
+  
+
+  @Input() rooms: any[] = [];
 
   onBuildingChange(event: any) {
     this.buildingFilterChange.emit(event.target.value);
@@ -16,5 +21,9 @@ export class FiltersComponent {
 
   onFloorChange(event: any) {
     this.floorFilterChange.emit(event.target.value);
+  }
+
+  onCapacityChange(event: any) {
+    this.capacityFilterChange.emit(event.target.value);
   }
 }

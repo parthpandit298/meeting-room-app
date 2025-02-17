@@ -14,6 +14,7 @@ export class DashboardComponent implements OnInit{
 
   private currentBuilding = 'all';
   private currentFloor = 'all';
+  private currentCapacity = 'all';
 
   constructor(private mettingRoomService: MeetingRoomService) {}
 
@@ -32,16 +33,21 @@ export class DashboardComponent implements OnInit{
   }
 
   onBuildingFilterChange(building: string) {
-    this.filterRooms(building, this.currentFloor);
+    this.filterRooms(building, this.currentFloor,this.currentCapacity);
   }
 
   onFloorFilterChange(floor: string) {
-    this.filterRooms(this.currentBuilding, floor);
+    this.filterRooms(this.currentBuilding, floor, this.currentCapacity);
   }
 
-  private filterRooms(building: string, floor: string) {
+  onCapacityFilterChnage(capcity:string){
+    this.filterRooms(this.currentBuilding,this.currentFloor,capcity);
+  }
+
+  private filterRooms(building: string, floor: string,capacity:string) {
     this.currentBuilding = building;
     this.currentFloor = floor;
+    this.currentCapacity = capacity;
 
     // If your data does not have a string "Building X" in it,
     // you'll need to adapt the check here. For example:
@@ -52,7 +58,8 @@ export class DashboardComponent implements OnInit{
     this.filteredRooms = this.rooms.filter(room => {
       const matchesBuilding = (building === 'all') || (room.buildingName === building);
       const matchesFloor = (floor === 'all') || (room.floorNo.toString() === floor);
-      return matchesBuilding && matchesFloor;
+      const matchesCapacity = capacity === 'all'|| (room.capacity.toString() === capacity)
+      return matchesBuilding && matchesFloor && matchesCapacity;
     });
   }
 
